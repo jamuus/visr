@@ -5,29 +5,44 @@
         
         #log {
             position: fixed;
-            width: 300px;
+            width: 20%;
             height: 100%;
             right: 0;
             top: 0;
         }
+        #container {
+            position: fixed;
+            width: 80%;
+        }
     </style>
 </head>
 
-<body onload="createTimeline()">
-    <canvas id="chart" width="600" height="400"></canvas>
-
+<body onload="init()">
+<div id="container">
+    <canvas id="chart1" width="600" height="400"></canvas>
+    <canvas id="chart2" width="600" height="400"></canvas>
+    <canvas id="chart3" width="600" height="400"></canvas>
+    <canvas id="chart4" width="600" height="400"></canvas>
+</div>
     <textarea id="log"></textarea>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="smoothie.js"></script>
     <script type="text/javascript">
 
     var socket = io();
-    var n1 = new TimeSeries();
+
+    var ts1 = new TimeSeries();
+    var ts2 = new TimeSeries();
+    var ts3 = new TimeSeries();
+    var ts4 = new TimeSeries();
+
     var log = document.querySelector('#log');
 
     socket.on('data', parseLine);
 
     var state = {};
+
+    var var2ts = {a: ts1,b: ts2,c: ts3,d: ts4};
 
     function parseLine(line) {
         line = line.split(':');
@@ -35,17 +50,24 @@
         var value = parseFloat(line[1].trim());
         state[variable] = value;
         log.value = JSON.stringify(state, null, '    ');
-        n1.append(new Date().getTime(), value);
+
+        var2ts[variable].append(new Date().getTime(), value);
     }
 
-    function createTimeline() {
-        var chart = new SmoothieChart({millisPerPixel: 3});
-        chart.addTimeSeries(n1, {
+    function init() {
+        createTimeline('chart1', ts1);
+        createTimeline('chart2', ts2);
+        createTimeline('chart3', ts3);
+        createTimeline('chart4', ts4);
+    }
+
+    function createTimeline(id, ts) {
+        var chart = new SmoothieChart({millisPerPixel: 10});
+        chart.addTimeSeries(ts, {
             strokeStyle: 'rgba(255, 0, 0, 1)',
-            // fillStyle: 'rgba(0, 255, 0, 0.2)',
             lineWidth: 2
         });
-        chart.streamTo(document.getElementById("chart"), 500);
+        chart.streamTo(document.getElementById(id), 500);
     }
     </script>
 </body>
