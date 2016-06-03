@@ -1,4 +1,4 @@
-#!/Users/jamus/.nvm/versions/node/v5.5.0/bin/node
+#!/usr/bin/env node
 
 var readline = require('readline');
 
