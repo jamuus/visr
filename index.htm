@@ -1,0 +1,53 @@
+<html>
+
+<head>
+    <style type="text/css">
+        
+        #log {
+            position: fixed;
+            width: 300px;
+            height: 100%;
+            right: 0;
+            top: 0;
+        }
+    </style>
+</head>
+
+<body onload="createTimeline()">
+    <canvas id="chart" width="600" height="400"></canvas>
+
+    <textarea id="log"></textarea>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="smoothie.js"></script>
+    <script type="text/javascript">
+
+    var socket = io();
+    var n1 = new TimeSeries();
+    var log = document.querySelector('#log');
+
+    socket.on('data', parseLine);
+
+    var state = {};
+
+    function parseLine(line) {
+        line = line.split(':');
+        var variable = line[0].trim();
+        var value = parseFloat(line[1].trim());
+        state[variable] = value;
+        log.value = JSON.stringify(state, null, '    ');
+        n1.append(new Date().getTime(), value);
+    }
+
+    function createTimeline() {
+        var chart = new SmoothieChart({millisPerPixel: 3});
+        chart.addTimeSeries(n1, {
+            strokeStyle: 'rgba(255, 0, 0, 1)',
+            // fillStyle: 'rgba(0, 255, 0, 0.2)',
+            lineWidth: 2
+        });
+        chart.streamTo(document.getElementById("chart"), 500);
+    }
+    </script>
+</body>
+
+</html>
