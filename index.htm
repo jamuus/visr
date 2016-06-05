@@ -2,33 +2,41 @@
 
 <head>
     <style type="text/css">
-        
-        #log {
-            position: fixed;
-            width: 20%;
-            height: 100%;
-            right: 0;
-            top: 0;
-        }
-        #container {
-            position: fixed;
-            width: 80%;
-        }
+    #log {
+        position: fixed;
+        width: 20%;
+        height: 100%;
+        right: 0;
+        top: 0;
+    }
+    
+    #container {
+        position: absolute;
+        width: 80%;
+    }
+    
+    #chart1 #chart2 #chart3 #chart4 {
+        /*width: 50%;*/
+        /*height: 50%;*/
+    }
+    body {
+        margin: 0;
+        padding: 0;
+    }
     </style>
 </head>
 
-<body onload="init()">
-<div id="container">
-    <canvas id="chart1" width="600" height="400"></canvas>
-    <canvas id="chart2" width="600" height="400"></canvas>
-    <canvas id="chart3" width="600" height="400"></canvas>
-    <canvas id="chart4" width="600" height="400"></canvas>
-</div>
+<body onload="init()" onresize="resizeCanvases()">
+    <div id="container">
+        <canvas id="chart1"></canvas>
+        <canvas id="chart2"></canvas>
+        <canvas id="chart3"></canvas>
+        <canvas id="chart4"></canvas>
+    </div>
     <textarea id="log"></textarea>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="smoothie.js"></script>
     <script type="text/javascript">
-
     var socket = io();
 
     var ts1 = new TimeSeries();
@@ -42,7 +50,12 @@
 
     var state = {};
 
-    var var2ts = {a: ts1,b: ts2,c: ts3,d: ts4};
+    var var2ts = {
+        a: ts1,
+        b: ts2,
+        c: ts3,
+        d: ts4
+    };
 
     function parseLine(line) {
         line = line.split(':');
@@ -62,12 +75,31 @@
     }
 
     function createTimeline(id, ts) {
-        var chart = new SmoothieChart({millisPerPixel: 10});
+        var chart = new SmoothieChart({
+            millisPerPixel: 10
+        });
         chart.addTimeSeries(ts, {
             strokeStyle: 'rgba(255, 0, 0, 1)',
             lineWidth: 2
         });
         chart.streamTo(document.getElementById(id), 500);
+    }
+
+    function resizeCanvases() {
+        var windowHeight = window.innerHeight;
+        var windowWidth = window.innerWidth;
+        var cvsWidth = windowWidth / 2 * 0.79;
+        var cvsHeight = windowHeight / 2 * 0.79;
+        resizeCanvas('chart1', cvsWidth, cvsHeight);
+        resizeCanvas('chart2', cvsWidth, cvsHeight);
+        resizeCanvas('chart3', cvsWidth, cvsHeight);
+        resizeCanvas('chart4', cvsWidth, cvsHeight);
+    }
+
+    function resizeCanvas(id, width, height) {
+        var cvs = document.getElementById(id);
+        cvs.width = width;
+        cvs.height = height;
     }
     </script>
 </body>
